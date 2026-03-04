@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leolife OS v2 - Ultra Control</title>
+    <title>Leolife OS v3 - Multi-Project Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -14,6 +14,8 @@
         .kanban-column { min-height: 400px; }
         .task-card { transition: transform 0.2s, border-color 0.2s; }
         .task-card:hover { transform: translateY(-2px); border-color: rgba(59, 130, 246, 0.5); }
+        .project-tab { transition: all 0.3s; cursor: pointer; }
+        .project-tab.active { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: #60a5fa; }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
@@ -27,21 +29,14 @@
             <div>
                 <div class="flex items-center gap-3 mb-1">
                     <div class="h-3 w-3 rounded-full bg-blue-500 animate-pulse"></div>
-                    <h1 class="text-4xl font-extrabold tracking-tight text-white">LEOLIFE <span class="text-blue-500">OS</span></h1>
+                    <h1 class="text-4xl font-extrabold tracking-tight text-white uppercase">LEO<span class="text-blue-500">LIFE</span></h1>
                 </div>
                 <p id="sync-info" class="text-slate-500 text-sm font-medium tracking-wide"></p>
             </div>
             
-            <div class="flex gap-4">
-                <div class="glass px-5 py-3 rounded-2xl flex items-center gap-4">
-                    <div class="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                        <i data-lucide="zap" class="text-blue-400"></i>
-                    </div>
-                    <div>
-                        <p class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">Active Project</p>
-                        <p class="font-bold text-white">Revolt Group</p>
-                    </div>
-                </div>
+            <!-- Project Switcher -->
+            <div class="flex gap-2 bg-slate-900/50 p-1 rounded-2xl border border-white/5" id="project-switcher">
+                <!-- Project tabs will be injected here -->
             </div>
         </header>
 
@@ -61,12 +56,12 @@
 
             <div class="glass p-5 rounded-3xl group">
                 <div class="flex justify-between items-start mb-4">
-                    <i data-lucide="activity" class="text-emerald-400"></i>
+                    <i data-lucide="swords" class="text-red-400"></i>
                 </div>
-                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Health Status</h3>
-                <p class="text-2xl font-bold text-white" id="workout-val">Daily Movement</p>
-                <p class="text-xs text-emerald-400 mt-2 flex items-center gap-1 font-medium">
-                    <i data-lucide="check-circle" size="12"></i> Ready to start
+                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Sport Focus</h3>
+                <p class="text-2xl font-bold text-white" id="workout-val">Muay Thai</p>
+                <p class="text-xs text-red-400 mt-2 flex items-center gap-1 font-medium italic">
+                    <i data-lucide="clock" size="12"></i> Check schedule
                 </p>
             </div>
 
@@ -74,9 +69,9 @@
                 <div class="flex justify-between items-start mb-4">
                     <i data-lucide="layout" class="text-purple-400"></i>
                 </div>
-                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Active Tasks</h3>
+                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Vibe Coding</h3>
                 <p class="text-2xl font-bold text-white" id="task-count">0</p>
-                <p class="text-xs text-slate-500 mt-2">Across 3 stages</p>
+                <p class="text-xs text-slate-500 mt-2">Course Launch Prep</p>
             </div>
 
             <div class="glass p-5 rounded-3xl bg-gradient-to-br from-blue-600/10 to-transparent">
@@ -84,7 +79,7 @@
                     <i data-lucide="brain-circuit" class="text-blue-300"></i>
                 </div>
                 <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">AI Context</h3>
-                <p class="text-sm font-medium text-slate-300 leading-relaxed">Revolt strategy locked. Monitoring GitHub Pages sync.</p>
+                <p class="text-sm font-medium text-slate-300 leading-relaxed" id="ai-context">Syncing tasks...</p>
             </div>
         </div>
 
@@ -109,38 +104,41 @@ const DASHBOARD_DATA = {
     user: "Leogelv",
     location: "Da Nang",
     lastSync: new Date().toLocaleString(),
+    activeProjectId: 'revolt',
     projects: [
         { id: 'revolt', name: 'Revolt Group', status: 'Active', color: 'blue' },
-        { id: 'leolife', name: 'Leolife AI', status: 'Building', color: 'emerald' }
+        { id: 'vibecoding', name: 'Vibe Coding Course', status: 'Launching', color: 'purple' },
+        { id: 'danang-hub', name: 'Danang Hub App', status: 'Building', color: 'emerald' }
     ],
     kanban: [
         {
-            id: 'todo',
-            title: 'To Do',
+            id: 'priority',
+            title: '🚀 В приоритете',
             tasks: [
-                { id: 1, text: 'Request Revolt Pitch Deck', tag: 'Business', priority: 'High' },
-                { id: 2, text: 'Draft "AI Bug" post for Threads', tag: 'Content', priority: 'Medium' }
+                { id: 101, text: 'Дананг-хаб апп: забилдить проект', tag: 'System', priority: 'High' },
+                { id: 102, text: 'Встреча с Ником: доработать проект/задачи', tag: 'Meeting', priority: 'High' },
+                { id: 103, text: 'Оффер для Revolt: подготовить и отправить', tag: 'Business', priority: 'High' }
             ]
         },
         {
-            id: 'inprogress',
-            title: 'In Progress',
+            id: 'dev-content',
+            title: '🤖 Разработка и Контент',
             tasks: [
-                { id: 3, text: 'Revolt Website Repackaging', tag: 'Business', priority: 'High' },
-                { id: 4, text: 'GitHub Dashboard Automation', tag: 'System', priority: 'High' }
+                { id: 201, text: 'Бот для курса Вайбкодинга: разработка функционала', tag: 'VibeCoding', priority: 'Medium' },
+                { id: 202, text: 'Видео на YouTube: ролик по боту', tag: 'YouTube', priority: 'Medium' }
             ]
         },
         {
-            id: 'done',
-            title: 'Done',
+            id: 'personal',
+            title: '🥊 Личное / Спорт',
             tasks: [
-                { id: 5, text: 'Create revolt-web project', tag: 'System', priority: 'Low' }
+                { id: 301, text: 'Муай-тай: записаться на тренировку', tag: 'Health', priority: 'Medium' }
             ]
         }
     ],
     health: {
         water: { current: 1.2, goal: 2.5, unit: 'L' },
-        workout: { status: 'Pending', label: 'Daily Movement' }
+        workout: { status: 'Pending', label: 'Muay Thai' }
     }
 };
 
@@ -148,6 +146,14 @@ const DASHBOARD_DATA = {
         function renderDashboard() {
             document.getElementById('sync-info').innerText = `${DASHBOARD_DATA.location} | Last Sync: ${DASHBOARD_DATA.lastSync}`;
             
+            // Render Project Switcher
+            const switcher = document.getElementById('project-switcher');
+            switcher.innerHTML = DASHBOARD_DATA.projects.map(p => `
+                <div class="project-tab px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider border border-transparent ${DASHBOARD_DATA.activeProjectId === p.id ? 'active' : 'text-slate-500'}" onclick="switchProject('${p.id}')">
+                    ${p.name}
+                </div>
+            `).join('');
+
             // Render Stats
             const h = DASHBOARD_DATA.health;
             const waterPct = Math.round((h.water.current / h.water.goal) * 100);
@@ -155,6 +161,7 @@ const DASHBOARD_DATA = {
             document.getElementById('water-val').innerText = `${h.water.current} / ${h.water.goal} ${h.water.unit}`;
             document.getElementById('water-bar').style.width = `${waterPct}%`;
             document.getElementById('workout-val').innerText = h.workout.label;
+            document.getElementById('ai-context').innerText = `Focused on ${DASHBOARD_DATA.projects.find(p => p.id === DASHBOARD_DATA.activeProjectId).name}. GitHub sync active.`;
 
             // Render Kanban
             const board = document.getElementById('kanban-board');
@@ -179,14 +186,13 @@ const DASHBOARD_DATA = {
                                     <p class="text-sm font-semibold text-slate-200 mb-4 leading-snug">${task.text}</p>
                                     <div class="flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
                                         <div class="flex gap-2">
-                                            <i data-lucide="message-square" size="12"></i>
-                                            <i data-lucide="paperclip" size="12"></i>
+                                            <i data-lucide="check-circle" size="12"></i>
+                                            <i data-lucide="calendar" size="12"></i>
                                         </div>
-                                        <i data-lucide="more-horizontal" size="14"></i>
+                                        <i data-lucide="external-link" size="14"></i>
                                     </div>
                                 </div>
                             `).join('')}
-                            <button class="w-full py-3 rounded-2xl border border-dashed border-slate-800 text-slate-600 text-xs font-bold hover:bg-slate-900/50 transition-all uppercase tracking-widest">+ Add Task</button>
                         </div>
                     </div>
                 `;
@@ -197,11 +203,16 @@ const DASHBOARD_DATA = {
             lucide.createIcons();
         }
 
+        function switchProject(id) {
+            DASHBOARD_DATA.activeProjectId = id;
+            renderDashboard();
+        }
+
         // Local Storage for notes
         const notesArea = document.getElementById('local-notes');
-        notesArea.value = localStorage.getItem('leolife_notes_v2') || '';
+        notesArea.value = localStorage.getItem('leolife_notes_v3') || '';
         notesArea.addEventListener('input', (e) => {
-            localStorage.setItem('leolife_notes_v2', e.target.value);
+            localStorage.setItem('leolife_notes_v3', e.target.value);
         });
 
         renderDashboard();
