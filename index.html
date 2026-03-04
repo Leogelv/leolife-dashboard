@@ -4,123 +4,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leolife OS - Dashboard</title>
+    <title>Leolife OS v2 - Ultra Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; }
+        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
+        .kanban-column { min-height: 400px; }
+        .task-card { transition: transform 0.2s, border-color 0.2s; }
+        .task-card:hover { transform: translateY(-2px); border-color: rgba(59, 130, 246, 0.5); }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
     </style>
 </head>
-<body class="p-4 md:p-8">
-    <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-8">
+<body class="p-4 md:p-10 min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/20 via-slate-950 to-slate-950">
+    
+    <div class="max-w-7xl mx-auto">
+        <!-- TOP NAV -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <div>
-                <h1 class="text-3xl font-bold text-white">Leolife OS</h1>
-                <p class="text-slate-400">Da Nang | 10:00 AM Sync</p>
-            </div>
-            <div class="glass p-3 rounded-xl flex items-center gap-4">
-                <div class="text-right">
-                    <p class="text-xs text-slate-400 underline">Current Project</p>
-                    <p class="font-semibold text-blue-400">Revolt Group</p>
+                <div class="flex items-center gap-3 mb-1">
+                    <div class="h-3 w-3 rounded-full bg-blue-500 animate-pulse"></div>
+                    <h1 class="text-4xl font-extrabold tracking-tight text-white">LEOLIFE <span class="text-blue-500">OS</span></h1>
                 </div>
-                <i data-lucide="layers" class="text-blue-400"></i>
+                <p id="sync-info" class="text-slate-500 text-sm font-medium tracking-wide"></p>
             </div>
-        </div>
-
-        <!-- Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <!-- Column 1: Business -->
-            <div class="space-y-6">
-                <div class="glass p-5 rounded-2xl">
-                    <div class="flex items-center gap-2 mb-4 text-blue-400">
-                        <i data-lucide="briefcase" size="20"></i>
-                        <h2 class="font-bold uppercase tracking-wider text-sm">Business Strategy</h2>
+            <div class="flex gap-4">
+                <div class="glass px-5 py-3 rounded-2xl flex items-center gap-4">
+                    <div class="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                        <i data-lucide="zap" class="text-blue-400"></i>
                     </div>
-                    <div class="space-y-3">
-                        <div class="p-3 bg-slate-800/50 rounded-lg border-l-4 border-blue-500">
-                            <p class="text-sm font-medium">Revolt Repackaging</p>
-                            <p class="text-xs text-slate-400 mt-1">Status: Waiting for Pitch Deck</p>
-                        </div>
-                        <div class="p-3 bg-slate-800/50 rounded-lg opacity-50">
-                            <p class="text-sm">AI Agent Audit</p>
-                        </div>
+                    <div>
+                        <p class="text-[10px] uppercase text-slate-500 font-bold tracking-widest">Active Project</p>
+                        <p class="font-bold text-white">Revolt Group</p>
                     </div>
                 </div>
             </div>
+        </header>
 
-            <!-- Column 2: Content -->
-            <div class="space-y-6">
-                <div class="glass p-5 rounded-2xl border-t-4 border-purple-500">
-                    <div class="flex items-center gap-2 mb-4 text-purple-400">
-                        <i data-lucide="pen-tool" size="20"></i>
-                        <h2 class="font-bold uppercase tracking-wider text-sm">Threads Content</h2>
-                    </div>
-                    <ul class="space-y-4">
-                        <li class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 rounded border-slate-700 bg-slate-900">
-                            <div>
-                                <p class="text-sm">Post: "AI Agent Bug" Question</p>
-                                <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded">Tuesday Focus</span>
-                            </div>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <input type="checkbox" class="mt-1 rounded border-slate-700 bg-slate-900">
-                            <p class="text-sm">Repackage: Revolt Case Study</p>
-                        </li>
-                    </ul>
+        <!-- STATS / HEALTH -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="glass p-5 rounded-3xl relative overflow-hidden group">
+                <div class="flex justify-between items-start mb-4">
+                    <i data-lucide="droplets" class="text-blue-400"></i>
+                    <span class="text-xs font-bold text-blue-400 bg-blue-400/10 px-2 py-1 rounded-full" id="water-pct">48%</span>
+                </div>
+                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Hydration</h3>
+                <p class="text-2xl font-bold text-white" id="water-val">1.2 / 2.5 L</p>
+                <div class="w-full bg-slate-800 h-1.5 rounded-full mt-4 overflow-hidden">
+                    <div id="water-bar" class="bg-blue-500 h-full transition-all duration-1000" style="width: 48%"></div>
                 </div>
             </div>
 
-            <!-- Column 3: Health & Vibe -->
-            <div class="space-y-6">
-                <div class="glass p-5 rounded-2xl border-t-4 border-emerald-500">
-                    <div class="flex items-center gap-2 mb-4 text-emerald-400">
-                        <i data-lucide="heart" size="20"></i>
-                        <h2 class="font-bold uppercase tracking-wider text-sm">Health Transformation</h2>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-slate-800/50 p-3 rounded-xl text-center">
-                            <p class="text-2xl font-bold">2L</p>
-                            <p class="text-[10px] text-slate-400 uppercase">Water</p>
-                        </div>
-                        <div class="bg-slate-800/50 p-3 rounded-xl text-center">
-                            <p class="text-2xl font-bold">0/1</p>
-                            <p class="text-[10px] text-slate-400 uppercase">Workout</p>
-                        </div>
-                    </div>
+            <div class="glass p-5 rounded-3xl group">
+                <div class="flex justify-between items-start mb-4">
+                    <i data-lucide="activity" class="text-emerald-400"></i>
                 </div>
-
-                <!-- AI Memory Sync -->
-                <div class="glass p-5 rounded-2xl bg-blue-500/5">
-                    <div class="flex items-center gap-2 mb-2 text-blue-300">
-                        <i data-lucide="cpu" size="16"></i>
-                        <h2 class="font-bold text-xs uppercase">AI Memory Sync</h2>
-                    </div>
-                    <p class="text-xs text-slate-400 italic">"Focused on high-trust packaging for investment holdings. Cron set to 10:00 AM."</p>
-                </div>
+                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Health Status</h3>
+                <p class="text-2xl font-bold text-white" id="workout-val">Daily Movement</p>
+                <p class="text-xs text-emerald-400 mt-2 flex items-center gap-1 font-medium">
+                    <i data-lucide="check-circle" size="12"></i> Ready to start
+                </p>
             </div>
 
+            <div class="glass p-5 rounded-3xl">
+                <div class="flex justify-between items-start mb-4">
+                    <i data-lucide="layout" class="text-purple-400"></i>
+                </div>
+                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Active Tasks</h3>
+                <p class="text-2xl font-bold text-white" id="task-count">0</p>
+                <p class="text-xs text-slate-500 mt-2">Across 3 stages</p>
+            </div>
+
+            <div class="glass p-5 rounded-3xl bg-gradient-to-br from-blue-600/10 to-transparent">
+                <div class="flex justify-between items-start mb-4">
+                    <i data-lucide="brain-circuit" class="text-blue-300"></i>
+                </div>
+                <h3 class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">AI Context</h3>
+                <p class="text-sm font-medium text-slate-300 leading-relaxed">Revolt strategy locked. Monitoring GitHub Pages sync.</p>
+            </div>
         </div>
 
-        <!-- Interactive Note Area -->
-        <div class="mt-8">
-            <textarea class="w-full h-32 glass rounded-2xl p-4 text-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type notes here... (Local storage saves automatically)"></textarea>
+        <!-- KANBAN BOARD -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="kanban-board">
+            <!-- Columns will be injected here -->
+        </div>
+
+        <!-- FOOTER NOTES -->
+        <div class="mt-12">
+             <div class="flex items-center gap-2 mb-4 text-slate-500">
+                <i data-lucide="sticky-note" size="16"></i>
+                <h2 class="text-xs font-bold uppercase tracking-widest">System Notes</h2>
+            </div>
+            <textarea id="local-notes" class="w-full h-32 glass rounded-3xl p-6 text-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all" placeholder="Quick capture... (Saves locally)"></textarea>
         </div>
     </div>
 
     <script>
-        lucide.createIcons();
         
-        // Simple persistence for the textarea
-        const textarea = document.querySelector('textarea');
-        textarea.value = localStorage.getItem('leolife_notes') || '';
-        textarea.addEventListener('input', (e) => {
-            localStorage.setItem('leolife_notes', e.target.value);
+const DASHBOARD_DATA = {
+    user: "Leogelv",
+    location: "Da Nang",
+    lastSync: new Date().toLocaleString(),
+    projects: [
+        { id: 'revolt', name: 'Revolt Group', status: 'Active', color: 'blue' },
+        { id: 'leolife', name: 'Leolife AI', status: 'Building', color: 'emerald' }
+    ],
+    kanban: [
+        {
+            id: 'todo',
+            title: 'To Do',
+            tasks: [
+                { id: 1, text: 'Request Revolt Pitch Deck', tag: 'Business', priority: 'High' },
+                { id: 2, text: 'Draft "AI Bug" post for Threads', tag: 'Content', priority: 'Medium' }
+            ]
+        },
+        {
+            id: 'inprogress',
+            title: 'In Progress',
+            tasks: [
+                { id: 3, text: 'Revolt Website Repackaging', tag: 'Business', priority: 'High' },
+                { id: 4, text: 'GitHub Dashboard Automation', tag: 'System', priority: 'High' }
+            ]
+        },
+        {
+            id: 'done',
+            title: 'Done',
+            tasks: [
+                { id: 5, text: 'Create revolt-web project', tag: 'System', priority: 'Low' }
+            ]
+        }
+    ],
+    health: {
+        water: { current: 1.2, goal: 2.5, unit: 'L' },
+        workout: { status: 'Pending', label: 'Daily Movement' }
+    }
+};
+
+
+        function renderDashboard() {
+            document.getElementById('sync-info').innerText = `${DASHBOARD_DATA.location} | Last Sync: ${DASHBOARD_DATA.lastSync}`;
+            
+            // Render Stats
+            const h = DASHBOARD_DATA.health;
+            const waterPct = Math.round((h.water.current / h.water.goal) * 100);
+            document.getElementById('water-pct').innerText = `${waterPct}%`;
+            document.getElementById('water-val').innerText = `${h.water.current} / ${h.water.goal} ${h.water.unit}`;
+            document.getElementById('water-bar').style.width = `${waterPct}%`;
+            document.getElementById('workout-val').innerText = h.workout.label;
+
+            // Render Kanban
+            const board = document.getElementById('kanban-board');
+            board.innerHTML = '';
+            let totalTasks = 0;
+
+            DASHBOARD_DATA.kanban.forEach(col => {
+                totalTasks += col.tasks.length;
+                const colHtml = `
+                    <div class="kanban-column">
+                        <div class="flex items-center justify-between mb-6 px-2">
+                            <h2 class="font-bold text-slate-400 text-sm uppercase tracking-[0.2em]">${col.title}</h2>
+                            <span class="text-[10px] font-bold bg-slate-800 text-slate-500 px-2 py-0.5 rounded-full">${col.tasks.length}</span>
+                        </div>
+                        <div class="space-y-4">
+                            ${col.tasks.map(task => `
+                                <div class="task-card glass p-5 rounded-2xl border-l-2 border-transparent relative group cursor-pointer">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 uppercase tracking-wider">${task.tag}</span>
+                                        <div class="h-2 w-2 rounded-full ${task.priority === 'High' ? 'bg-red-500' : 'bg-slate-700'}"></div>
+                                    </div>
+                                    <p class="text-sm font-semibold text-slate-200 mb-4 leading-snug">${task.text}</p>
+                                    <div class="flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
+                                        <div class="flex gap-2">
+                                            <i data-lucide="message-square" size="12"></i>
+                                            <i data-lucide="paperclip" size="12"></i>
+                                        </div>
+                                        <i data-lucide="more-horizontal" size="14"></i>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            <button class="w-full py-3 rounded-2xl border border-dashed border-slate-800 text-slate-600 text-xs font-bold hover:bg-slate-900/50 transition-all uppercase tracking-widest">+ Add Task</button>
+                        </div>
+                    </div>
+                `;
+                board.innerHTML += colHtml;
+            });
+
+            document.getElementById('task-count').innerText = totalTasks;
+            lucide.createIcons();
+        }
+
+        // Local Storage for notes
+        const notesArea = document.getElementById('local-notes');
+        notesArea.value = localStorage.getItem('leolife_notes_v2') || '';
+        notesArea.addEventListener('input', (e) => {
+            localStorage.setItem('leolife_notes_v2', e.target.value);
         });
+
+        renderDashboard();
     </script>
 </body>
 </html>
