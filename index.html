@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leolife OS v5 - Full Edit Mode</title>
+    <title>Leolife OS v6 - Live Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -25,7 +25,7 @@
     <div class="max-w-7xl mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <div>
-                <h1 class="text-3xl font-extrabold tracking-tight text-white">LEOLIFE <span class="text-blue-500">OS</span></h1>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white uppercase tracking-tighter">LEOLIFE <span class="text-blue-500">OS</span></h1>
                 <p id="sync-info" class="text-slate-500 text-sm font-medium"></p>
             </div>
             <div class="flex gap-2 bg-slate-900/50 p-1 rounded-2xl border border-white/5" id="project-switcher"></div>
@@ -59,12 +59,6 @@
                 <div class="task-list space-y-4 min-h-[450px]" data-col="done"></div>
             </div>
         </div>
-
-        <div class="mt-12 flex justify-end">
-            <button onclick="saveState()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-blue-600/20">
-                Fix Current State (Save)
-            </button>
-        </div>
     </div>
 
     <script>
@@ -72,16 +66,17 @@
             user: "Leogelv",
             location: "Da Nang",
             lastSync: new Date().toLocaleString(),
-            activeProjectId: 'revolt',
+            activeProjectId: 'vibecoding',
             projects: [
-                { id: 'revolt', name: 'Revolt Group', status: 'Active', color: 'blue' },
                 { id: 'vibecoding', name: 'Vibe Coding', status: 'Launching', color: 'purple' },
+                { id: 'revolt', name: 'Revolt Group', status: 'Active', color: 'blue' },
                 { id: 'danang-hub', name: 'Danang Hub', status: 'Building', color: 'emerald' }
             ],
             tasks: [
                 { id: 1, projectId: 'revolt', column: 'todo', text: 'Request Revolt Pitch Deck', tag: 'Business', owner: '@leogelv' },
                 { id: 2, projectId: 'revolt', column: 'inprogress', text: 'Revolt Website Repackaging', tag: 'Dev', owner: '@ai_agent' },
-                { id: 4, projectId: 'vibecoding', column: 'todo', text: 'Бот для курса: разработка логики', tag: 'Dev', owner: '@developer_nick' },
+                { id: 9, projectId: 'revolt', column: 'done', text: 'Счет отправлен парк-отелю (Контракт закрыт)', tag: 'Finance', owner: '@leogelv' },
+                { id: 4, projectId: 'vibecoding', column: 'inprogress', text: 'Бот для курса: фаза оптимизаций', tag: 'Dev', owner: '@developer_nick' },
                 { id: 5, projectId: 'vibecoding', column: 'todo', text: 'YouTube: ролик по боту', tag: 'Content', owner: '@editor_pro' },
                 { id: 7, projectId: 'danang-hub', column: 'todo', text: 'Дананг-хаб апп: забилдить проект', tag: 'System', owner: '@leogelv' },
                 { id: 8, projectId: 'all', column: 'todo', text: 'Муай-тай: тренировка', tag: 'Health', owner: '@leogelv' }
@@ -133,7 +128,7 @@
             });
             
             lucide.createIcons();
-            document.getElementById('sync-info').innerText = `Pro Mode | Project: ${currentProj.toUpperCase()}`;
+            document.getElementById('sync-info').innerText = `Last Sync: ${new Date().toLocaleTimeString()} | Project: ${currentProj.toUpperCase()}`;
         }
 
         function updateTask(id, field, value) {
@@ -169,11 +164,6 @@
         function switchProject(id) {
             DASHBOARD_DATA.activeProjectId = id;
             render();
-        }
-
-        function saveState() {
-            console.log("Current Data Structure:", JSON.stringify(DASHBOARD_DATA, null, 2));
-            alert("State captured in console! Copy it to the agent to save permanently.");
         }
 
         render();
