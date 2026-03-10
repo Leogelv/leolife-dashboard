@@ -169,7 +169,6 @@ async function loadData() {
         render();
     } catch (err) {
         console.error('Failed to load from GitHub:', err);
-        // Если нет токена и репо приватный, или другая ошибка
         if (!getToken()) {
             showTokenModal();
         } else {
