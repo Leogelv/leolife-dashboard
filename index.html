@@ -1,215 +1,408 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leolife OS v10 - Elite Focus</title>
+    <title>Leolife OS v12 — Command Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
         :root {
-            --bg: #020617;
-            --card-bg: rgba(15, 23, 42, 0.6);
-            --text: #f8fafc;
-            --border: rgba(255, 255, 255, 0.08);
+            --bg: #030712;
+            --surface: rgba(15, 23, 42, 0.5);
+            --surface-hover: rgba(30, 41, 59, 0.6);
+            --text: #f1f5f9;
+            --text-muted: #64748b;
+            --border: rgba(255, 255, 255, 0.06);
             --accent: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.15);
+            --success: #10b981;
+            --warning: #f59e0b;
         }
 
         .light-theme {
-            --bg: #f8fafc;
-            --card-bg: rgba(255, 255, 255, 0.8);
+            --bg: #f1f5f9;
+            --surface: rgba(255, 255, 255, 0.7);
+            --surface-hover: rgba(255, 255, 255, 0.9);
             --text: #0f172a;
-            --border: rgba(0, 0, 0, 0.08);
+            --text-muted: #64748b;
+            --border: rgba(0, 0, 0, 0.06);
             --accent: #2563eb;
+            --accent-glow: rgba(37, 99, 235, 0.1);
+            --success: #059669;
+            --warning: #d97706;
         }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            transition: background-color 0.3s, color 0.3s;
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.4s ease, color 0.3s ease;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        .glass { 
-            background: var(--card-bg); 
-            backdrop-filter: blur(12px); 
-            border: 1px solid var(--border); 
-            box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.1);
+        /* Анимированные блобы */
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.35;
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s ease-in-out infinite;
+        }
+        .blob-1 { width: 600px; height: 600px; background: #3b82f6; top: -200px; left: -100px; animation-delay: 0s; }
+        .blob-2 { width: 500px; height: 500px; background: #8b5cf6; bottom: -150px; right: -100px; animation-delay: -7s; }
+        .blob-3 { width: 400px; height: 400px; background: #06b6d4; top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -14s; }
+        .light-theme .blob { opacity: 0.12; }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 40px) scale(0.95); }
+            75% { transform: translate(30px, 20px) scale(1.02); }
         }
 
-        .kanban-column { 
-            min-height: 650px; 
-            background: rgba(125, 125, 125, 0.03); 
-            border-radius: 28px; 
+        /* Glassmorphism */
+        .glass {
+            background: var(--surface);
+            backdrop-filter: blur(20px) saturate(1.5);
+            -webkit-backdrop-filter: blur(20px) saturate(1.5);
+            border: 1px solid var(--border);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass:hover { background: var(--surface-hover); }
+
+        .glass-strong {
+            background: var(--surface);
+            backdrop-filter: blur(40px) saturate(1.8);
+            -webkit-backdrop-filter: blur(40px) saturate(1.8);
+            border: 1px solid var(--border);
+        }
+
+        /* Канбан */
+        .kanban-column {
+            min-height: 500px;
+            background: rgba(125, 125, 125, 0.02);
+            border: 1px solid var(--border);
+            border-radius: 24px;
             padding: 20px;
         }
 
-        .project-tab { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .project-tab.active { 
-            background: var(--accent); 
-            color: white; 
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+        /* Табы */
+        .project-tab {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
+        .project-tab::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: inherit;
+        }
+        .project-tab.active::before { opacity: 1; }
+        .project-tab.active { color: white; box-shadow: 0 8px 32px -4px rgba(59, 130, 246, 0.4); }
+        .project-tab span { position: relative; z-index: 1; }
 
-        .task-card { 
-            transition: transform 0.2s, box-shadow 0.2s;
+        /* Карточки */
+        .task-card {
+            transition: transform 0.2s, box-shadow 0.3s;
             cursor: grab;
         }
-        .task-card:hover { transform: translateY(-2px); }
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.3);
+        }
+        .task-card:active { cursor: grabbing; }
 
-        .theme-toggle { cursor: pointer; }
+        .task-card .border-indicator {
+            position: absolute;
+            left: 0; top: 12px; bottom: 12px;
+            width: 3px;
+            border-radius: 0 3px 3px 0;
+        }
+
+        /* Stat ring */
+        .stat-ring {
+            width: 52px; height: 52px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 14px;
+            position: relative;
+        }
+        .stat-ring::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 50%;
+            padding: 2px;
+            background: conic-gradient(var(--accent) var(--progress), transparent var(--progress));
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: xor;
+            -webkit-mask-composite: xor;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.2); }
+            50% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
+        }
+        .pulse-border { animation: pulse-glow 2s ease-in-out infinite; }
+
+        .content-wrapper { position: relative; z-index: 1; }
     </style>
 </head>
-<body class="p-4 md:p-10 min-h-screen">
-    
-    <div class="max-w-7xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+<body class="p-4 md:p-8 lg:p-10">
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="content-wrapper max-w-[1400px] mx-auto">
+
+        <!-- HEADER -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
             <div class="flex items-center gap-4">
-                <div class="h-12 w-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-                    <i data-lucide="zap" class="text-white"></i>
+                <div class="h-14 w-14 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
+                    <i data-lucide="command" class="text-white w-7 h-7"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-black tracking-tight uppercase">Leolife <span class="text-blue-600">OS</span></h1>
-                    <p id="sync-info" class="text-slate-500 text-[10px] font-bold uppercase tracking-widest"></p>
+                    <h1 class="text-2xl font-black tracking-tight">LEOLIFE <span class="bg-gradient-to-r from-blue-500 to-violet-500 bg-clip-text text-transparent">OS</span></h1>
+                    <p id="sync-info" class="text-[10px] font-bold uppercase tracking-[0.2em]" style="color: var(--text-muted)"></p>
                 </div>
             </div>
-            
-            <div class="flex items-center gap-4">
-                <button onclick="toggleTheme()" class="glass p-3 rounded-2xl theme-toggle">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" class="glass p-3 rounded-xl hover:scale-105 transition-transform" title="Toggle theme">
                     <i data-lucide="sun" id="theme-icon" class="w-5 h-5"></i>
                 </button>
-                <div class="flex gap-1 bg-slate-900/20 p-1 rounded-2xl border border-white/5 glass" id="project-switcher"></div>
+                <div class="flex gap-1 glass-strong p-1.5 rounded-2xl" id="project-switcher"></div>
             </div>
         </header>
 
-        <!-- MENTOR DASH -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-10">
-            <div class="md:col-span-8 glass p-8 rounded-[2rem] border-l-4 border-blue-500 relative overflow-hidden">
-                <div class="flex items-center gap-3 mb-4 text-blue-500">
-                    <i data-lucide="target" size="20"></i>
-                    <h2 class="text-xs font-black uppercase tracking-[0.2em]">Current Mission</h2>
-                </div>
-                <p class="text-2xl font-bold mb-4 leading-tight" id="active-mission">Loading mission...</p>
-                <div class="flex items-center gap-4">
-                    <span class="text-[10px] font-bold px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20 uppercase">High Priority</span>
-                    <span class="text-[10px] font-bold text-slate-500 uppercase">Deadline: April 20</span>
+        <!-- BENTO GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
+            <!-- Mission -->
+            <div class="md:col-span-5 glass p-7 rounded-3xl relative overflow-hidden pulse-border">
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-violet-500/5"></div>
+                <div class="relative">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i data-lucide="crosshair" class="w-4 h-4" style="color: var(--accent)"></i>
+                        <span class="text-[10px] font-black uppercase tracking-[0.25em]" style="color: var(--accent)">Current Mission</span>
+                    </div>
+                    <p class="text-xl font-bold mb-5 leading-snug" id="active-mission">Loading...</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-[9px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider" style="background: var(--accent-glow); color: var(--accent)">High Priority</span>
+                        <span class="text-[9px] font-bold px-3 py-1.5 rounded-full uppercase tracking-wider" style="background: rgba(245, 158, 11, 0.1); color: var(--warning)">Deadline: April 20</span>
+                    </div>
                 </div>
             </div>
-            
-            <div class="md:col-span-4 glass p-8 rounded-[2rem] bg-gradient-to-br from-blue-600/5 to-transparent">
-                <div class="flex items-center gap-3 mb-4 text-emerald-500">
-                    <i data-lucide="award" size="20"></i>
-                    <h2 class="text-xs font-black uppercase tracking-[0.2em]">Mentor Challenge</h2>
+            <!-- Challenge -->
+            <div class="md:col-span-4 glass p-7 rounded-3xl relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-cyan-500/5"></div>
+                <div class="relative">
+                    <div class="flex items-center gap-2 mb-4">
+                        <i data-lucide="flame" class="w-4 h-4" style="color: var(--success)"></i>
+                        <span class="text-[10px] font-black uppercase tracking-[0.25em]" style="color: var(--success)">Mentor Challenge</span>
+                    </div>
+                    <p class="text-sm font-medium mb-5 italic leading-relaxed" style="color: var(--text-muted)" id="challenge-text">"Спроси незнакомца: как ты сохраняешь фокус?"</p>
+                    <button onclick="completeChallenge()" class="w-full py-3 rounded-xl text-[10px] font-bold uppercase tracking-[0.2em] transition-all hover:scale-[1.02]" style="background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2)">
+                        Submit Proof
+                    </button>
                 </div>
-                <p class="text-sm font-medium text-slate-400 mb-4 italic">"How do you stay focused on your dreams?" - Спроси незнакомца.</p>
-                <button onclick="completeChallenge()" class="w-full py-3 rounded-xl bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all">Submit Proof</button>
+            </div>
+            <!-- Stats -->
+            <div class="md:col-span-3 glass p-7 rounded-3xl">
+                <div class="flex items-center gap-2 mb-5">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4" style="color: var(--text-muted)"></i>
+                    <span class="text-[10px] font-black uppercase tracking-[0.25em]" style="color: var(--text-muted)">Progress</span>
+                </div>
+                <div class="space-y-4" id="stats-container"></div>
             </div>
         </div>
 
         <!-- KANBAN -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="kanban-board">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="kanban-board">
             <div class="kanban-column" id="col-todo">
-                <h2 class="font-bold text-slate-400 text-[10px] uppercase tracking-[0.3em] mb-8 px-2 flex justify-between">To Do <span class="count">0</span></h2>
-                <div class="task-list space-y-4" data-col="todo"></div>
+                <div class="flex justify-between items-center mb-6 px-1">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full" style="background: var(--text-muted)"></div>
+                        <h2 class="font-bold text-[10px] uppercase tracking-[0.3em]" style="color: var(--text-muted)">To Do</h2>
+                    </div>
+                    <span class="count text-[11px] font-bold px-2.5 py-0.5 rounded-lg" style="background: var(--surface); color: var(--text-muted)">0</span>
+                </div>
+                <div class="task-list space-y-3" data-col="todo"></div>
             </div>
             <div class="kanban-column" id="col-inprogress">
-                <h2 class="font-bold text-blue-500 text-[10px] uppercase tracking-[0.3em] mb-8 px-2 flex justify-between">In Progress <span class="count">0</span></h2>
-                <div class="task-list space-y-4" data-col="inprogress"></div>
+                <div class="flex justify-between items-center mb-6 px-1">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full" style="background: var(--accent)"></div>
+                        <h2 class="font-bold text-[10px] uppercase tracking-[0.3em]" style="color: var(--accent)">In Progress</h2>
+                    </div>
+                    <span class="count text-[11px] font-bold px-2.5 py-0.5 rounded-lg" style="background: var(--accent-glow); color: var(--accent)">0</span>
+                </div>
+                <div class="task-list space-y-3" data-col="inprogress"></div>
             </div>
             <div class="kanban-column" id="col-done">
-                <h2 class="font-bold text-emerald-500 text-[10px] uppercase tracking-[0.3em] mb-8 px-2 flex justify-between">Done <span class="count">0</span></h2>
-                <div class="task-list space-y-4" data-col="done"></div>
+                <div class="flex justify-between items-center mb-6 px-1">
+                    <div class="flex items-center gap-2">
+                        <div class="w-2 h-2 rounded-full" style="background: var(--success)"></div>
+                        <h2 class="font-bold text-[10px] uppercase tracking-[0.3em]" style="color: var(--success)">Done</h2>
+                    </div>
+                    <span class="count text-[11px] font-bold px-2.5 py-0.5 rounded-lg" style="background: rgba(16, 185, 129, 0.1); color: var(--success)">0</span>
+                </div>
+                <div class="task-list space-y-3" data-col="done"></div>
             </div>
         </div>
+
+        <footer class="mt-12 text-center">
+            <p class="text-[10px] font-bold uppercase tracking-[0.3em]" style="color: var(--text-muted)">Leolife OS v12 — Built with focus, not distraction</p>
+        </footer>
     </div>
 
     <script>
         let DASHBOARD_DATA = {
             activeProjectId: 'money',
-            theme: 'dark',
+            theme: localStorage.getItem('leolife-theme') || 'dark',
             projects: [
-                { id: 'money', name: '💰 Money', mission: 'Закрыть контракт Revolt и упаковать ВШЭ' },
-                { id: 'revolt', name: 'Revolt', mission: 'Scale high-ticket AI agency' },
-                { id: 'vibecoding', name: 'Vibe Coding', mission: 'Launch HSE course & private stream' },
-                { id: 'hobbies', name: '🎨 Hobbies', mission: 'Enjoy the process (Low priority)' }
+                { id: 'money',      name: '💰 Money',    mission: 'Закрыть контракт Revolt и упаковать ВШЭ',   color: '#3b82f6' },
+                { id: 'revolt',     name: 'Revolt',      mission: 'Scale high-ticket AI agency',                color: '#8b5cf6' },
+                { id: 'vibecoding', name: 'Vibe Coding', mission: 'Launch HSE course & private stream',         color: '#06b6d4' },
+                { id: 'hobbies',    name: '🎨 Hobbies',  mission: 'Enjoy the process (Low priority)',            color: '#f59e0b' },
             ],
             tasks: [
-                { id: 1, projectId: 'revolt', column: 'todo', text: 'Revolt: Выслать Roadmap (не ждать их)', tag: 'Money', owner: '@leogelv' },
-                { id: 2, projectId: 'revolt', column: 'inprogress', text: 'Revolt Website Repackaging', tag: 'Dev', owner: '@ai_agent' },
-                { id: 3, projectId: 'revolt', column: 'done', text: 'Счет парк-отелю отправлен', tag: 'Money', owner: '@leogelv' },
-                { id: 4, projectId: 'vibecoding', column: 'inprogress', text: 'ВШЭ: План курса (3 темы)', tag: 'Money', owner: '@leogelv' },
-                { id: 5, projectId: 'vibecoding', column: 'todo', text: 'YouTube: 1 мин чернового видео', tag: 'Money', owner: '@leogelv' },
-                { id: 6, projectId: 'vibecoding', column: 'done', text: 'Бот: основной функционал', tag: 'Dev', owner: '@leogelv' },
-                { id: 7, projectId: 'hobbies', column: 'todo', text: 'EEG API Exploration', tag: 'Fun', owner: '@leogelv' },
-                { id: 8, projectId: 'hobbies', column: 'todo', text: 'Music Trio Rehearsal', tag: 'Fun', owner: '@leogelv' }
-            ]
+                { id: 1,  projectId: 'revolt',     column: 'todo',       text: 'Revolt: Выслать Roadmap (не ждать их)',   tag: 'Money',  owner: '@leogelv' },
+                { id: 2,  projectId: 'revolt',     column: 'inprogress', text: 'Revolt Website Repackaging',              tag: 'Dev',    owner: '@ai_agent' },
+                { id: 3,  projectId: 'revolt',     column: 'done',       text: 'Счет парк-отелю отправлен',               tag: 'Money',  owner: '@leogelv' },
+                { id: 4,  projectId: 'vibecoding', column: 'inprogress', text: 'ВШЭ: План курса (3 темы)',                tag: 'Money',  owner: '@leogelv' },
+                { id: 5,  projectId: 'vibecoding', column: 'todo',       text: 'YouTube: 1 мин чернового видео',          tag: 'Money',  owner: '@leogelv' },
+                { id: 6,  projectId: 'vibecoding', column: 'done',       text: 'Бот: основной функционал',                tag: 'Dev',    owner: '@leogelv' },
+                { id: 7,  projectId: 'hobbies',    column: 'todo',       text: 'EEG API Exploration',                     tag: 'Fun',    owner: '@leogelv' },
+                { id: 8,  projectId: 'hobbies',    column: 'todo',       text: 'Music Trio Rehearsal',                    tag: 'Fun',    owner: '@leogelv' },
+            ],
+        };
+
+        const TAG_COLORS = {
+            Money: { bg: 'rgba(59, 130, 246, 0.1)',  text: '#3b82f6', border: '#3b82f6' },
+            Dev:   { bg: 'rgba(139, 92, 246, 0.1)',  text: '#8b5cf6', border: '#8b5cf6' },
+            Fun:   { bg: 'rgba(245, 158, 11, 0.1)',  text: '#f59e0b', border: '#f59e0b' },
         };
 
         function render() {
-            const currentProj = DASHBOARD_DATA.activeProjectId;
-            const project = DASHBOARD_DATA.projects.find(p => p.id === currentProj);
-            
-            document.getElementById('active-mission').innerText = project.mission;
-            document.getElementById('sync-info').innerText = `Elite Sync: ${new Date().toLocaleTimeString()} | ${currentProj.toUpperCase()}`;
-            
-            // Switcher
+            const cur = DASHBOARD_DATA.activeProjectId;
+            const proj = DASHBOARD_DATA.projects.find(p => p.id === cur);
+
+            document.getElementById('active-mission').innerText = proj.mission;
+            document.getElementById('sync-info').innerText = `Synced ${new Date().toLocaleTimeString()} · ${cur.toUpperCase()}`;
+
             document.getElementById('project-switcher').innerHTML = DASHBOARD_DATA.projects.map(p => `
-                <button onclick="switchProject('${p.id}')" class="project-tab px-5 py-2.5 rounded-xl text-[10px] font-bold uppercase tracking-wider ${currentProj === p.id ? 'active' : 'text-slate-500'}">
-                    ${p.name}
+                <button onclick="switchProject('${p.id}')"
+                    class="project-tab px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider ${cur === p.id ? 'active' : ''}"
+                    style="${cur !== p.id ? 'color: var(--text-muted)' : ''}">
+                    <span>${p.name}</span>
                 </button>
             `).join('');
 
-            // Columns
-            ['todo', 'inprogress', 'done'].forEach(colId => {
-                const list = document.querySelector(`#col-${colId} .task-list`);
-                // FIXED FILTER LOGIC: If 'money', show all tasks EXCEPT hobbies. Else show project-specific.
-                const filtered = DASHBOARD_DATA.tasks.filter(t => 
-                    t.column === colId && 
-                    (currentProj === 'money' ? (t.projectId !== 'hobbies') : (t.projectId === currentProj))
-                );
-                
-                document.querySelector(`#col-${colId} .count`).innerText = filtered.length;
-                list.innerHTML = filtered.map(t => `
-                    <div class="task-card glass p-6 rounded-3xl border-l-4 ${t.tag === 'Money' ? 'border-blue-500' : 'border-slate-700'}" data-id="${t.id}">
-                        <div class="flex justify-between items-start mb-4">
-                            <span class="text-[9px] font-black px-2 py-1 rounded bg-slate-800/10 text-slate-500 uppercase tracking-widest">${t.tag}</span>
-                            <span class="text-[10px] font-bold text-blue-500">${t.owner}</span>
-                        </div>
-                        <p class="text-sm font-bold text-current leading-snug">${t.text}</p>
+            const filterTasks = (col) => DASHBOARD_DATA.tasks.filter(t =>
+                t.column === col && (cur === 'money' ? t.projectId !== 'hobbies' : t.projectId === cur)
+            );
+
+            const allVisible = DASHBOARD_DATA.tasks.filter(t => cur === 'money' ? t.projectId !== 'hobbies' : t.projectId === cur);
+            const doneCount = allVisible.filter(t => t.column === 'done').length;
+            const total = allVisible.length;
+            const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+            document.getElementById('stats-container').innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-2xl font-black">${doneCount}/${total}</div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider" style="color: var(--text-muted)">Tasks Done</div>
                     </div>
-                `).join('');
-                
+                    <div class="stat-ring" style="--progress: ${pct}%; color: var(--accent)">${pct}%</div>
+                </div>
+                <div class="h-1.5 rounded-full overflow-hidden" style="background: var(--border)">
+                    <div class="h-full rounded-full transition-all duration-500" style="width: ${pct}%; background: linear-gradient(90deg, var(--accent), #8b5cf6)"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <div class="text-center"><div class="text-lg font-black">${filterTasks('todo').length}</div><div class="text-[8px] font-bold uppercase" style="color: var(--text-muted)">Todo</div></div>
+                    <div class="text-center"><div class="text-lg font-black" style="color: var(--accent)">${filterTasks('inprogress').length}</div><div class="text-[8px] font-bold uppercase" style="color: var(--text-muted)">Active</div></div>
+                    <div class="text-center"><div class="text-lg font-black" style="color: var(--success)">${doneCount}</div><div class="text-[8px] font-bold uppercase" style="color: var(--text-muted)">Done</div></div>
+                </div>
+            `;
+
+            ['todo', 'inprogress', 'done'].forEach(colId => {
+                const col = document.getElementById(`col-${colId}`);
+                const list = col.querySelector('.task-list');
+                const filtered = filterTasks(colId);
+                col.querySelector('.count').innerText = filtered.length;
+
+                list.innerHTML = filtered.map(t => {
+                    const tc = TAG_COLORS[t.tag] || TAG_COLORS.Dev;
+                    return `
+                        <div class="task-card glass p-5 rounded-2xl relative pl-7" data-id="${t.id}">
+                            <div class="border-indicator" style="background: ${tc.border}"></div>
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-widest" style="background: ${tc.bg}; color: ${tc.text}">${t.tag}</span>
+                                <span class="text-[10px] font-bold" style="color: var(--accent)">${t.owner}</span>
+                            </div>
+                            <p class="text-[13px] font-semibold leading-snug">${t.text}</p>
+                            ${cur === 'money' && t.projectId ? `<span class="text-[9px] font-bold mt-2 block uppercase tracking-wider" style="color: var(--text-muted)">${t.projectId}</span>` : ''}
+                        </div>
+                    `;
+                }).join('');
+
                 new Sortable(list, {
-                    group: 'kanban',
-                    animation: 200,
+                    group: 'kanban', animation: 250, ghostClass: 'opacity-30',
                     onEnd: (evt) => {
-                        const taskId = evt.item.getAttribute('data-id');
+                        const tid = parseInt(evt.item.getAttribute('data-id'));
                         const newCol = evt.to.getAttribute('data-col');
-                        const task = DASHBOARD_DATA.tasks.find(t => t.id == taskId);
-                        if(task) task.column = newCol;
+                        const task = DASHBOARD_DATA.tasks.find(t => t.id === tid);
+                        if (task) task.column = newCol;
                         render();
                     }
                 });
             });
-        }
-
-        function switchProject(id) { DASHBOARD_DATA.activeProjectId = id; render(); }
-        
-        function toggleTheme() {
-            DASHBOARD_DATA.theme = DASHBOARD_DATA.theme === 'dark' ? 'light' : 'dark';
-            document.body.classList.toggle('light-theme');
-            const icon = document.getElementById('theme-icon');
-            icon.setAttribute('data-lucide', DASHBOARD_DATA.theme === 'dark' ? 'sun' : 'moon');
             lucide.createIcons();
         }
 
+        function switchProject(id) { DASHBOARD_DATA.activeProjectId = id; render(); }
+
+        function toggleTheme() {
+            DASHBOARD_DATA.theme = DASHBOARD_DATA.theme === 'dark' ? 'light' : 'dark';
+            document.body.classList.toggle('light-theme');
+            localStorage.setItem('leolife-theme', DASHBOARD_DATA.theme);
+            document.getElementById('theme-icon').setAttribute('data-lucide', DASHBOARD_DATA.theme === 'dark' ? 'sun' : 'moon');
+            lucide.createIcons();
+        }
+
+        function completeChallenge() {
+            const btn = event.target;
+            btn.innerText = 'DONE — RESPECT';
+            btn.style.background = 'var(--success)';
+            btn.style.color = 'white';
+            setTimeout(() => {
+                document.getElementById('challenge-text').innerText = '"Завтра будет новый вызов. Не расслабляйся."';
+                btn.innerText = 'Submit Proof';
+                btn.style.background = 'rgba(16, 185, 129, 0.1)';
+                btn.style.color = 'var(--success)';
+            }, 3000);
+        }
+
+        if (DASHBOARD_DATA.theme === 'light') document.body.classList.add('light-theme');
         render();
-        lucide.createIcons();
     </script>
 </body>
 </html>
