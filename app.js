@@ -38,7 +38,10 @@ async function fetchDataFromGitHub() {
 
     const json = await resp.json();
     fileSha = json.sha;
-    const content = atob(json.content.replace(/\n/g, ''));
+    // Декодируем base64 → UTF-8 (поддержка кириллицы)
+    const binary = atob(json.content.replace(/\n/g, ''));
+    const bytes = Uint8Array.from(binary, c => c.charCodeAt(0));
+    const content = new TextDecoder('utf-8').decode(bytes);
     return JSON.parse(content);
 }
 
@@ -51,7 +54,9 @@ async function saveDataToGitHub() {
 
     showSaveStatus('saving', 'Saving...');
 
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(DATA, null, 2) + '\n')));
+    // Кодируем UTF-8 → base64 (поддержка кириллицы)
+    const textBytes = new TextEncoder().encode(JSON.stringify(DATA, null, 2) + '\n');
+    const content = btoa(String.fromCharCode(...textBytes));
 
     try {
         const resp = await fetch(
