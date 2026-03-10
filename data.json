@@ -1,0 +1,33 @@
+{
+  "version": 12,
+  "activeProjectId": "money",
+  "mission": {
+    "priority": "High Priority",
+    "deadline": "April 20"
+  },
+  "challenge": {
+    "text": "Спроси незнакомца: как ты сохраняешь фокус?",
+    "completedText": "Завтра будет новый вызов. Не расслабляйся."
+  },
+  "projects": [
+    { "id": "money",      "name": "💰 Money",    "mission": "Закрыть контракт Revolt и упаковать ВШЭ",   "color": "#3b82f6" },
+    { "id": "revolt",     "name": "Revolt",      "mission": "Scale high-ticket AI agency",                "color": "#8b5cf6" },
+    { "id": "vibecoding", "name": "Vibe Coding", "mission": "Launch HSE course & private stream",         "color": "#06b6d4" },
+    { "id": "hobbies",    "name": "🎨 Hobbies",  "mission": "Enjoy the process (Low priority)",            "color": "#f59e0b" }
+  ],
+  "tasks": [
+    { "id": 1,  "projectId": "revolt",     "column": "todo",       "text": "Revolt: Выслать Roadmap (не ждать их)",   "tag": "Money",  "owner": "@leogelv" },
+    { "id": 2,  "projectId": "revolt",     "column": "inprogress", "text": "Revolt Website Repackaging",              "tag": "Dev",    "owner": "@ai_agent" },
+    { "id": 3,  "projectId": "revolt",     "column": "done",       "text": "Счет парк-отелю отправлен",               "tag": "Money",  "owner": "@leogelv" },
+    { "id": 4,  "projectId": "vibecoding", "column": "inprogress", "text": "ВШЭ: План курса (3 темы)",                "tag": "Money",  "owner": "@leogelv" },
+    { "id": 5,  "projectId": "vibecoding", "column": "todo",       "text": "YouTube: 1 мин чернового видео",          "tag": "Money",  "owner": "@leogelv" },
+    { "id": 6,  "projectId": "vibecoding", "column": "done",       "text": "Бот: основной функционал",                "tag": "Dev",    "owner": "@leogelv" },
+    { "id": 7,  "projectId": "hobbies",    "column": "todo",       "text": "EEG API Exploration",                     "tag": "Fun",    "owner": "@leogelv" },
+    { "id": 8,  "projectId": "hobbies",    "column": "todo",       "text": "Music Trio Rehearsal",                    "tag": "Fun",    "owner": "@leogelv" }
+  ],
+  "tagColors": {
+    "Money": { "bg": "rgba(59, 130, 246, 0.1)",  "text": "#3b82f6", "border": "#3b82f6" },
+    "Dev":   { "bg": "rgba(139, 92, 246, 0.1)",  "text": "#8b5cf6", "border": "#8b5cf6" },
+    "Fun":   { "bg": "rgba(245, 158, 11, 0.1)",  "text": "#f59e0b", "border": "#f59e0b" }
+  }
+}
