@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leolife OS v6 - Live Sync</title>
+    <title>Leolife OS v7 - Mentor Mode</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -14,9 +14,7 @@
         .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
         .kanban-column { min-height: 600px; background: rgba(255,255,255,0.02); border-radius: 24px; padding: 16px; border: 1px solid rgba(255,255,255,0.03); }
         .task-card { transition: all 0.2s; cursor: grab; }
-        .task-card:active { cursor: grabbing; }
         .project-tab.active { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: #60a5fa; }
-        .sortable-ghost { opacity: 0.3; transform: scale(0.95); }
         [contenteditable]:focus { outline: none; background: rgba(255,255,255,0.05); border-radius: 4px; }
     </style>
 </head>
@@ -25,35 +23,44 @@
     <div class="max-w-7xl mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <div>
-                <h1 class="text-3xl font-extrabold tracking-tight text-white uppercase tracking-tighter">LEOLIFE <span class="text-blue-500">OS</span></h1>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white uppercase italic">LEOLIFE <span class="text-blue-500">MENTOR</span></h1>
                 <p id="sync-info" class="text-slate-500 text-sm font-medium"></p>
             </div>
             <div class="flex gap-2 bg-slate-900/50 p-1 rounded-2xl border border-white/5" id="project-switcher"></div>
         </header>
 
+        <!-- MENTOR'S DAILY CHALLENGE -->
+        <div class="glass p-6 rounded-3xl mb-10 border-l-4 border-blue-500 bg-blue-500/5">
+            <div class="flex items-center gap-3 mb-2 text-blue-400">
+                <i data-lucide="shield-alert" size="20"></i>
+                <h2 class="text-xs font-bold uppercase tracking-[0.2em]">Daily Challenge: Discomfort Zone</h2>
+            </div>
+            <p class="text-lg font-semibold text-white mb-2">Зайти в кафе и спросить незнакомца: "How do you stay focused on your dreams?"</p>
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold px-2 py-1 rounded bg-slate-800 text-slate-500 uppercase">Status: PENDING</span>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="kanban-board">
-            <!-- Columns -->
             <div class="kanban-column" id="col-todo">
-                <div class="flex items-center justify-between mb-6 px-2">
-                    <h2 class="font-bold text-slate-400 text-xs uppercase tracking-widest">To Do</h2>
+                <div class="flex items-center justify-between mb-6 px-2 text-slate-400">
+                    <h2 class="font-bold text-xs uppercase tracking-widest">To Do</h2>
                     <span class="count bg-slate-800 px-2 py-0.5 rounded text-[10px]">0</span>
                 </div>
                 <div class="task-list space-y-4 min-h-[450px]" data-col="todo"></div>
-                <button onclick="addTask('todo')" class="w-full mt-4 py-3 rounded-xl border border-dashed border-slate-800 text-slate-600 text-[10px] font-bold hover:bg-slate-900/50 transition-all uppercase tracking-widest">+ New Task</button>
             </div>
 
             <div class="kanban-column" id="col-inprogress">
-                <div class="flex items-center justify-between mb-6 px-2">
-                    <h2 class="font-bold text-blue-400 text-xs uppercase tracking-widest">In Progress</h2>
+                <div class="flex items-center justify-between mb-6 px-2 text-blue-400">
+                    <h2 class="font-bold text-xs uppercase tracking-widest">In Progress</h2>
                     <span class="count bg-blue-500/10 px-2 py-0.5 rounded text-[10px]">0</span>
                 </div>
                 <div class="task-list space-y-4 min-h-[450px]" data-col="inprogress"></div>
-                <button onclick="addTask('inprogress')" class="w-full mt-4 py-3 rounded-xl border border-dashed border-blue-900/30 text-blue-900/50 text-[10px] font-bold hover:bg-blue-900/10 transition-all uppercase tracking-widest">+ New Task</button>
             </div>
 
             <div class="kanban-column" id="col-done">
-                <div class="flex items-center justify-between mb-6 px-2">
-                    <h2 class="font-bold text-emerald-400 text-xs uppercase tracking-widest">Done</h2>
+                <div class="flex items-center justify-between mb-6 px-2 text-emerald-400">
+                    <h2 class="font-bold text-xs uppercase tracking-widest">Done</h2>
                     <span class="count bg-emerald-500/10 px-2 py-0.5 rounded text-[10px]">0</span>
                 </div>
                 <div class="task-list space-y-4 min-h-[450px]" data-col="done"></div>
@@ -63,109 +70,58 @@
 
     <script>
         let DASHBOARD_DATA = {
-            user: "Leogelv",
-            location: "Da Nang",
-            lastSync: new Date().toLocaleString(),
             activeProjectId: 'vibecoding',
             projects: [
-                { id: 'vibecoding', name: 'Vibe Coding', status: 'Launching', color: 'purple' },
-                { id: 'revolt', name: 'Revolt Group', status: 'Active', color: 'blue' },
-                { id: 'danang-hub', name: 'Danang Hub', status: 'Building', color: 'emerald' }
+                { id: 'vibecoding', name: 'Vibe Coding', status: 'Active' },
+                { id: 'revolt', name: 'Revolt Group', status: 'Active' },
+                { id: 'danang-hub', name: 'Danang Hub', status: 'Active' }
             ],
             tasks: [
-                { id: 1, projectId: 'revolt', column: 'todo', text: 'Request Revolt Pitch Deck', tag: 'Business', owner: '@leogelv' },
+                { id: 1, projectId: 'revolt', column: 'todo', text: 'Revolt: Ждать ответ по шагам (Approved)', tag: 'Wait', owner: '@leogelv' },
                 { id: 2, projectId: 'revolt', column: 'inprogress', text: 'Revolt Website Repackaging', tag: 'Dev', owner: '@ai_agent' },
-                { id: 9, projectId: 'revolt', column: 'done', text: 'Счет отправлен парк-отелю (Контракт закрыт)', tag: 'Finance', owner: '@leogelv' },
+                { id: 9, projectId: 'revolt', column: 'done', text: 'Счет отправлен парк-отелю', tag: 'Finance', owner: '@leogelv' },
                 { id: 4, projectId: 'vibecoding', column: 'inprogress', text: 'Бот для курса: фаза оптимизаций', tag: 'Dev', owner: '@developer_nick' },
                 { id: 5, projectId: 'vibecoding', column: 'todo', text: 'YouTube: ролик по боту', tag: 'Content', owner: '@editor_pro' },
-                { id: 7, projectId: 'danang-hub', column: 'todo', text: 'Дананг-хаб апп: забилдить проект', tag: 'System', owner: '@leogelv' },
-                { id: 8, projectId: 'all', column: 'todo', text: 'Муай-тай: тренировка', tag: 'Health', owner: '@leogelv' }
+                { id: 10, projectId: 'vibecoding', column: 'done', text: 'Бот для курса: основной функционал', tag: 'Dev', owner: '@leogelv' },
+                { id: 7, projectId: 'danang-hub', column: 'todo', text: 'Встреча с Ником (Week of March 10)', tag: 'Meeting', owner: '@leogelv' },
+                { id: 8, projectId: 'all', column: 'todo', text: 'Муай-тай: записаться', tag: 'Health', owner: '@leogelv' }
             ]
         };
 
         function render() {
             const currentProj = DASHBOARD_DATA.activeProjectId;
-            
-            // Switcher
             document.getElementById('project-switcher').innerHTML = DASHBOARD_DATA.projects.map(p => `
                 <button onclick="switchProject('${p.id}')" class="project-tab px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-transparent ${currentProj === p.id ? 'active' : 'text-slate-500'}">
                     ${p.name}
                 </button>
             `).join('');
 
-            // Lists
             ['todo', 'inprogress', 'done'].forEach(colId => {
                 const list = document.querySelector(`#col-${colId} .task-list`);
                 const filtered = DASHBOARD_DATA.tasks.filter(t => t.column === colId && (t.projectId === currentProj || t.projectId === 'all'));
-                
                 document.querySelector(`#col-${colId} .count`).innerText = filtered.length;
-                
                 list.innerHTML = filtered.map(t => `
-                    <div class="task-card glass p-5 rounded-2xl border-l-2 border-transparent relative group" data-id="${t.id}">
+                    <div class="task-card glass p-5 rounded-2xl border-l-2 border-transparent" data-id="${t.id}">
                         <div class="flex justify-between items-start mb-3">
-                            <span contenteditable="true" onblur="updateTask(${t.id}, 'tag', this.innerText)" class="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 uppercase tracking-widest cursor-text">${t.tag}</span>
-                            <span contenteditable="true" onblur="updateTask(${t.id}, 'owner', this.innerText)" class="text-[10px] font-medium text-blue-400 cursor-text">${t.owner}</span>
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 uppercase tracking-widest">${t.tag}</span>
+                            <span class="text-[10px] font-medium text-blue-400">${t.owner}</span>
                         </div>
-                        <p contenteditable="true" onblur="updateTask(${t.id}, 'text', this.innerText)" class="text-sm font-semibold text-slate-200 leading-snug cursor-text mb-2">${t.text}</p>
-                        <div class="flex justify-end opacity-20 group-hover:opacity-100 transition-opacity">
-                            <button onclick="deleteTask(${t.id})" class="text-red-500/50 hover:text-red-500"><i data-lucide="trash-2" size="12"></i></button>
-                        </div>
+                        <p class="text-sm font-semibold text-slate-200 leading-snug">${t.text}</p>
                     </div>
                 `).join('');
-                
-                new Sortable(list, {
-                    group: 'kanban',
-                    animation: 150,
-                    ghostClass: 'sortable-ghost',
-                    onEnd: (evt) => {
-                        const taskId = evt.item.getAttribute('data-id');
-                        const newCol = evt.to.getAttribute('data-col');
-                        const task = DASHBOARD_DATA.tasks.find(t => t.id == taskId);
-                        if(task) task.column = newCol;
-                        updateCounts();
-                    }
-                });
+                new Sortable(list, { group: 'kanban', animation: 150, onEnd: (evt) => {
+                    const taskId = evt.item.getAttribute('data-id');
+                    const newCol = evt.to.getAttribute('data-col');
+                    const task = DASHBOARD_DATA.tasks.find(t => t.id == taskId);
+                    if(task) task.column = newCol;
+                    render();
+                } });
             });
-            
             lucide.createIcons();
-            document.getElementById('sync-info').innerText = `Last Sync: ${new Date().toLocaleTimeString()} | Project: ${currentProj.toUpperCase()}`;
+            document.getElementById('sync-info').innerText = `Mentor Mode | Sync: ${new Date().toLocaleTimeString()}`;
         }
 
-        function updateTask(id, field, value) {
-            const task = DASHBOARD_DATA.tasks.find(t => t.id == id);
-            if(task) task[field] = value;
-        }
-
-        function addTask(column) {
-            const id = Date.now();
-            DASHBOARD_DATA.tasks.push({
-                id: id,
-                projectId: DASHBOARD_DATA.activeProjectId,
-                column: column,
-                text: 'New Task...',
-                tag: 'Task',
-                owner: '@leogelv'
-            });
-            render();
-        }
-
-        function deleteTask(id) {
-            DASHBOARD_DATA.tasks = DASHBOARD_DATA.tasks.filter(t => t.id != id);
-            render();
-        }
-
-        function updateCounts() {
-            ['todo', 'inprogress', 'done'].forEach(colId => {
-                const filtered = DASHBOARD_DATA.tasks.filter(t => t.column === colId && (t.projectId === DASHBOARD_DATA.activeProjectId || t.projectId === 'all'));
-                document.querySelector(`#col-${colId} .count`).innerText = filtered.length;
-            });
-        }
-
-        function switchProject(id) {
-            DASHBOARD_DATA.activeProjectId = id;
-            render();
-        }
-
+        function switchProject(id) { DASHBOARD_DATA.activeProjectId = id; render(); }
         render();
     </script>
 </body>
