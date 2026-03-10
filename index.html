@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leolife OS v7 - Mentor Mode</title>
+    <title>Leolife OS v8 - The Focus Filter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
@@ -13,78 +13,80 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #020617; color: #f8fafc; overflow-x: hidden; }
         .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
         .kanban-column { min-height: 600px; background: rgba(255,255,255,0.02); border-radius: 24px; padding: 16px; border: 1px solid rgba(255,255,255,0.03); }
-        .task-card { transition: all 0.2s; cursor: grab; }
-        .project-tab.active { background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.5); color: #60a5fa; }
-        [contenteditable]:focus { outline: none; background: rgba(255,255,255,0.05); border-radius: 4px; }
+        .project-tab.active { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.4); color: #ef4444; }
+        .money-maker { border: 1px solid rgba(34, 197, 94, 0.3); background: rgba(34, 197, 94, 0.05); }
     </style>
 </head>
-<body class="p-4 md:p-10 min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-slate-950 to-slate-950">
+<body class="p-4 md:p-10 min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-red-900/10 via-slate-950 to-slate-950">
     
     <div class="max-w-7xl mx-auto">
         <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
             <div>
-                <h1 class="text-3xl font-extrabold tracking-tight text-white uppercase italic">LEOLIFE <span class="text-blue-500">MENTOR</span></h1>
-                <p id="sync-info" class="text-slate-500 text-sm font-medium"></p>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white uppercase italic">LEOLIFE <span class="text-red-500">FOCUS</span></h1>
+                <p id="sync-info" class="text-slate-500 text-sm font-medium italic">Too many ideas, not enough execution.</p>
             </div>
-            <div class="flex gap-2 bg-slate-900/50 p-1 rounded-2xl border border-white/5" id="project-switcher"></div>
+            <div class="flex flex-wrap gap-2 bg-slate-900/50 p-1 rounded-2xl border border-white/5" id="project-switcher"></div>
         </header>
 
-        <!-- MENTOR'S DAILY CHALLENGE -->
-        <div class="glass p-6 rounded-3xl mb-10 border-l-4 border-blue-500 bg-blue-500/5">
-            <div class="flex items-center gap-3 mb-2 text-blue-400">
-                <i data-lucide="shield-alert" size="20"></i>
-                <h2 class="text-xs font-bold uppercase tracking-[0.2em]">Daily Challenge: Discomfort Zone</h2>
+        <!-- MENTOR'S TRUTH BOMB -->
+        <div class="glass p-8 rounded-3xl mb-10 border-l-4 border-red-500 bg-red-500/5">
+            <div class="flex items-center gap-3 mb-4 text-red-500">
+                <i data-lucide="skull" size="24"></i>
+                <h2 class="text-sm font-bold uppercase tracking-[0.3em]">The Reality Check</h2>
             </div>
-            <p class="text-lg font-semibold text-white mb-2">Зайти в кафе и спросить незнакомца: "How do you stay focused on your dreams?"</p>
-            <div class="flex items-center gap-2">
-                <span class="text-[10px] font-bold px-2 py-1 rounded bg-slate-800 text-slate-500 uppercase">Status: PENDING</span>
+            <p class="text-xl font-medium text-slate-200 leading-relaxed mb-6">
+                Ты хочешь "серьезных денег", но занимаешься <span class="text-red-400 font-bold underline">коллекционированием хобби</span>. ЭЭГ, музыка, нодный редактор — это круто для "пожить в удовольствие", но это НЕ приносит деньги СЕЙЧАС.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div class="p-4 rounded-2xl bg-green-500/10 border border-green-500/20">
+                    <p class="text-green-400 font-bold mb-1 uppercase tracking-widest">Money Makers (Focus here)</p>
+                    <ul class="text-slate-400 list-disc list-inside">
+                        <li>Revolt Group (High Ticket)</li>
+                        <li>Vibe Coding (Scalable)</li>
+                    </ul>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-800/30 border border-slate-700">
+                    <p class="text-slate-500 font-bold mb-1 uppercase tracking-widest">Distractions (Pause these)</p>
+                    <ul class="text-slate-600 list-disc list-inside">
+                        <li>EEG App, Pregnancy App, Music Trio</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="kanban-board">
             <div class="kanban-column" id="col-todo">
-                <div class="flex items-center justify-between mb-6 px-2 text-slate-400">
-                    <h2 class="font-bold text-xs uppercase tracking-widest">To Do</h2>
-                    <span class="count bg-slate-800 px-2 py-0.5 rounded text-[10px]">0</span>
-                </div>
-                <div class="task-list space-y-4 min-h-[450px]" data-col="todo"></div>
+                <h2 class="font-bold text-slate-400 text-xs uppercase tracking-widest mb-6 px-2">Money Moves (To Do)</h2>
+                <div class="task-list space-y-4 min-h-[400px]" data-col="todo"></div>
             </div>
-
             <div class="kanban-column" id="col-inprogress">
-                <div class="flex items-center justify-between mb-6 px-2 text-blue-400">
-                    <h2 class="font-bold text-xs uppercase tracking-widest">In Progress</h2>
-                    <span class="count bg-blue-500/10 px-2 py-0.5 rounded text-[10px]">0</span>
-                </div>
-                <div class="task-list space-y-4 min-h-[450px]" data-col="inprogress"></div>
+                <h2 class="font-bold text-blue-400 text-xs uppercase tracking-widest mb-6 px-2">In Execution</h2>
+                <div class="task-list space-y-4 min-h-[400px]" data-col="inprogress"></div>
             </div>
-
             <div class="kanban-column" id="col-done">
-                <div class="flex items-center justify-between mb-6 px-2 text-emerald-400">
-                    <h2 class="font-bold text-xs uppercase tracking-widest">Done</h2>
-                    <span class="count bg-emerald-500/10 px-2 py-0.5 rounded text-[10px]">0</span>
-                </div>
-                <div class="task-list space-y-4 min-h-[450px]" data-col="done"></div>
+                <h2 class="font-bold text-emerald-400 text-xs uppercase tracking-widest mb-6 px-2">Profit (Done)</h2>
+                <div class="task-list space-y-4 min-h-[400px]" data-col="done"></div>
             </div>
         </div>
     </div>
 
     <script>
         let DASHBOARD_DATA = {
-            activeProjectId: 'vibecoding',
+            activeProjectId: 'money',
             projects: [
+                { id: 'money', name: '💰 MONEY FOCUS', status: 'Priority' },
+                { id: 'revolt', name: 'Revolt', status: 'Active' },
                 { id: 'vibecoding', name: 'Vibe Coding', status: 'Active' },
-                { id: 'revolt', name: 'Revolt Group', status: 'Active' },
-                { id: 'danang-hub', name: 'Danang Hub', status: 'Active' }
+                { id: 'hobbies', name: '🎨 Hobbies/Distractions', status: 'Paused' }
             ],
             tasks: [
-                { id: 1, projectId: 'revolt', column: 'todo', text: 'Revolt: Ждать ответ по шагам (Approved)', tag: 'Wait', owner: '@leogelv' },
-                { id: 2, projectId: 'revolt', column: 'inprogress', text: 'Revolt Website Repackaging', tag: 'Dev', owner: '@ai_agent' },
-                { id: 9, projectId: 'revolt', column: 'done', text: 'Счет отправлен парк-отелю', tag: 'Finance', owner: '@leogelv' },
-                { id: 4, projectId: 'vibecoding', column: 'inprogress', text: 'Бот для курса: фаза оптимизаций', tag: 'Dev', owner: '@developer_nick' },
-                { id: 5, projectId: 'vibecoding', column: 'todo', text: 'YouTube: ролик по боту', tag: 'Content', owner: '@editor_pro' },
-                { id: 10, projectId: 'vibecoding', column: 'done', text: 'Бот для курса: основной функционал', tag: 'Dev', owner: '@leogelv' },
-                { id: 7, projectId: 'danang-hub', column: 'todo', text: 'Встреча с Ником (Week of March 10)', tag: 'Meeting', owner: '@leogelv' },
-                { id: 8, projectId: 'all', column: 'todo', text: 'Муай-тай: записаться', tag: 'Health', owner: '@leogelv' }
+                { id: 1, projectId: 'money', column: 'todo', text: 'Revolt: Выслать Next Steps (не ждать их)', tag: 'Money', owner: '@leogelv' },
+                { id: 2, projectId: 'money', column: 'inprogress', text: 'Revolt Website Repackaging', tag: 'Money', owner: '@ai_agent' },
+                { id: 4, projectId: 'money', column: 'inprogress', text: 'Vibe Coding: Оптимизация бота', tag: 'Money', owner: '@leogelv' },
+                { id: 5, projectId: 'money', column: 'todo', text: 'YouTube: 1 минута чернового видео', tag: 'Money', owner: '@leogelv' },
+                { id: 100, projectId: 'hobbies', column: 'todo', text: 'EEG API Integration', tag: 'Fun', owner: '@leogelv' },
+                { id: 101, projectId: 'hobbies', column: 'todo', text: 'Music Trio Rehearsal', tag: 'Fun', owner: '@leogelv' },
+                { id: 102, projectId: 'hobbies', column: 'todo', text: 'Pregnancy App Draft', tag: 'Fun', owner: '@leogelv' }
             ]
         };
 
@@ -98,13 +100,11 @@
 
             ['todo', 'inprogress', 'done'].forEach(colId => {
                 const list = document.querySelector(`#col-${colId} .task-list`);
-                const filtered = DASHBOARD_DATA.tasks.filter(t => t.column === colId && (t.projectId === currentProj || t.projectId === 'all'));
-                document.querySelector(`#col-${colId} .count`).innerText = filtered.length;
+                const filtered = DASHBOARD_DATA.tasks.filter(t => t.column === colId && (t.projectId === currentProj || currentProj === 'money' && t.projectId !== 'hobbies'));
                 list.innerHTML = filtered.map(t => `
-                    <div class="task-card glass p-5 rounded-2xl border-l-2 border-transparent" data-id="${t.id}">
+                    <div class="task-card glass p-5 rounded-2xl border-l-2 ${t.tag === 'Money' ? 'border-green-500' : 'border-transparent'}" data-id="${t.id}">
                         <div class="flex justify-between items-start mb-3">
                             <span class="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 uppercase tracking-widest">${t.tag}</span>
-                            <span class="text-[10px] font-medium text-blue-400">${t.owner}</span>
                         </div>
                         <p class="text-sm font-semibold text-slate-200 leading-snug">${t.text}</p>
                     </div>
@@ -118,7 +118,7 @@
                 } });
             });
             lucide.createIcons();
-            document.getElementById('sync-info').innerText = `Mentor Mode | Sync: ${new Date().toLocaleTimeString()}`;
+            document.getElementById('sync-info').innerText = currentProj === 'money' ? 'FOCUS MODE: MONEY ONLY' : 'VIEWING DISTRACTIONS';
         }
 
         function switchProject(id) { DASHBOARD_DATA.activeProjectId = id; render(); }
