@@ -39,7 +39,7 @@
     {
       "id": 1,
       "projectId": "revolt",
-      "column": "todo",
+      "column": "done",
       "text": "Revolt: Выслать Roadmap (не ждать их)",
       "tag": "Money",
       "owner": "@leogelv"
