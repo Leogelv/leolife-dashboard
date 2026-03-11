@@ -139,8 +139,13 @@ function showTokenModal() {
                     Read-only
                 </button>
             </div>
+            <div id="modal-deploy-status" style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted);margin-bottom:8px">Deploy Status</div>
+                <div id="modal-runs" style="font-size:12px;color:var(--text-muted)">Loading...</div>
+            </div>
         </div>
     `;
+    fetchDeployStatus('modal-runs');
     document.body.appendChild(overlay);
 }
 
@@ -343,10 +348,104 @@ function completeChallenge() {
     }, 3000);
 }
 
-// Настройки токена — можно вызвать из консоли: showTokenModal()
+// Настройки токена
 function resetToken() {
     localStorage.removeItem(LS_TOKEN_KEY);
     showTokenModal();
+}
+
+// ── Deploy Status (GitHub Actions) ──
+
+const RUN_STATUS_ICONS = {
+    completed: { success: '✅', failure: '❌', cancelled: '⚪' },
+    in_progress: '🔄',
+    queued: '⏳',
+};
+
+async function fetchDeployStatus(targetId) {
+    const token = getToken();
+    const headers = { 'Accept': 'application/vnd.github.v3+json' };
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    try {
+        const resp = await fetch(
+            `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/runs?per_page=5`,
+            { headers }
+        );
+        if (!resp.ok) throw new Error(`${resp.status}`);
+        const data = await resp.json();
+        const runs = data.workflow_runs || [];
+
+        const el = document.getElementById(targetId);
+        if (!el) return;
+
+        if (runs.length === 0) {
+            el.innerHTML = '<span style="color:var(--text-muted)">No runs</span>';
+            return;
+        }
+
+        el.innerHTML = runs.map(r => {
+            const icon = r.status === 'completed'
+                ? (RUN_STATUS_ICONS.completed[r.conclusion] || '❓')
+                : (RUN_STATUS_ICONS[r.status] || '❓');
+            const time = new Date(r.updated_at).toLocaleString();
+            const duration = r.status === 'completed' && r.run_started_at
+                ? Math.round((new Date(r.updated_at) - new Date(r.run_started_at)) / 1000) + 's'
+                : '...';
+            return `
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+                    <div style="display:flex;align-items:center;gap:6px">
+                        <span>${icon}</span>
+                        <span style="font-size:11px;font-weight:600;color:var(--text)">${r.display_title || r.name}</span>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-size:10px;color:var(--text-muted)">${time}</div>
+                        <div style="font-size:9px;color:var(--text-muted)">${duration}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        const el = document.getElementById(targetId);
+        if (el) el.innerHTML = `<span style="color:#ef4444;font-size:11px">Error: ${err.message}</span>`;
+    }
+}
+
+// Попап статуса деплоя
+function toggleDeployPopup() {
+    let popup = document.getElementById('deploy-popup');
+    if (popup) {
+        popup.remove();
+        return;
+    }
+    popup = document.createElement('div');
+    popup.id = 'deploy-popup';
+    popup.style.cssText = `
+        position:fixed;top:60px;right:20px;z-index:80;
+        width:360px;max-height:400px;overflow-y:auto;
+        padding:16px;border-radius:16px;
+        background:var(--surface);backdrop-filter:blur(40px);
+        border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,0.3);
+    `;
+    popup.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.15em;color:var(--text-muted)">GitHub Actions</span>
+            <button onclick="toggleDeployPopup()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:16px">&times;</button>
+        </div>
+        <div id="popup-runs" style="font-size:12px;color:var(--text-muted)">Loading...</div>
+    `;
+    document.body.appendChild(popup);
+    fetchDeployStatus('popup-runs');
+
+    // Закрыть при клике вне
+    setTimeout(() => {
+        document.addEventListener('click', function closePopup(e) {
+            if (!popup.contains(e.target) && !e.target.closest('[onclick*="toggleDeployPopup"]')) {
+                popup.remove();
+                document.removeEventListener('click', closePopup);
+            }
+        });
+    }, 100);
 }
 
 // ── Старт ──
